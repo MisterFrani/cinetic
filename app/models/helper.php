@@ -44,7 +44,7 @@ class Helper {
 	public function uploadFile($file,$destination){
 		// $destination = dirname(__DIR__).$destination_dir;
 		 $extre = explode('.',$file['name']);
-		$verif = array('png','jpg','jpeg','PNG','JPG','JPEG','mp4','webm','ogg','MP4','WEBM','OGG');
+		$verif = array('png','jpg','jpeg','PNG','svg','SVG','JPG','JPEG','mp4','webm','ogg','MP4','WEBM','OGG');
 		 if(in_array(end($extre),$verif)){
 			$fichier = round(microtime(true)).'.'.end($extre);
 			move_uploaded_file($file['tmp_name'], $destination . $fichier);
