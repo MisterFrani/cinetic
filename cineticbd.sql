@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.0
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
--- Hôte : localhost:8889
--- Généré le : dim. 03 avr. 2022 à 23:07
--- Version du serveur :  5.7.34
--- Version de PHP : 7.4.21
+-- Hôte : 127.0.0.1
+-- Généré le : sam. 09 avr. 2022 à 14:50
+-- Version du serveur : 10.4.22-MariaDB
+-- Version de PHP : 8.1.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -35,6 +35,19 @@ CREATE TABLE `comments` (
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `friends`
+--
+
+CREATE TABLE `friends` (
+  `id` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `follower` int(11) NOT NULL,
+  `date` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -123,6 +136,12 @@ ALTER TABLE `comments`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Index pour la table `friends`
+--
+ALTER TABLE `friends`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Index pour la table `likes`
 --
 ALTER TABLE `likes`
@@ -160,6 +179,12 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `comments`
 --
 ALTER TABLE `comments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `friends`
+--
+ALTER TABLE `friends`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
