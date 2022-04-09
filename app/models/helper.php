@@ -1,12 +1,12 @@
 <?php
-class Common {
+class Helper {
 
 
 	public function __construct()
 	{
 
 	}
-
+	// 
 	public function logout()
 	{
 		unset($_SESSION);
@@ -15,17 +15,25 @@ class Common {
 
 		return true;
 	}
+	// fonction pour hasher le mdp
+	public function cryptPass($pass) {
+		return hash("sha512", $pass);
+	}
+	//fonction pour formater le mail
+	public function verifMail($email) {
+		return filter_var($email, FILTER_VALIDATE_EMAIL);
+	}
 
 	public function echappe($string)
 	{
 		return str_replace("'","''",$string);
 	}
-
+	// pour formater le texte
 	public function text($string) {
 		$searched = array('&lt;','&gt;');
 		$replaced = array('<','>');
 
-		$string = htmlspecialchars($string, ENT_QUOTES, "UTF-8");
+		$string = htmlspecialchars(trim($string), ENT_QUOTES, "UTF-8");
 		$string = str_replace($searched,$replaced,$string);
 
 		return $string;

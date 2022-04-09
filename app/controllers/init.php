@@ -7,12 +7,12 @@ setlocale(LC_TIME, 'fr', 'fr_FR', 'fr_FR.ISO8859-1');
 
 include_once('./../includes/config.php');
 
-require_once('./../models/common.php');
+require_once('./../models/Helper.php');
 require_once('./../models/query.php');
 require_once('./../models/user.php');
 
 $db  = new Query();
-$cmn = new Common();
+$help = new Helper();
 $usr = new User();
 
 
