@@ -8,138 +8,101 @@ class User {
 		$this->sTable = TABLE_USERS;
 	}
 
-
-	public function infoUser($id){
+	public function register($dataForm){
 		global $db;
-		global $cmn;
+		global $help;
+
+		$data = [
+			"firstname"=> $help->text($dataForm["firstname"]),
+			"lastname"=> $help->text($dataForm["lasttname"]),
+			"email"=> $dataForm["email"],
+			"password"=> $help->cryptPass($dataForm["password"]),
+			"birthday"=> $dataForm["birthday"],
+			"sexe"=> $dataForm["sexe"],
+			"avatar"=> AVATAR_DEFAULT,
+			"statusId"=> STANDBY,
+			"isConnected"=> V_FALSE
+
+		];
 		
-		$param = array("usr_id"=>$id);
-		$user= $db->sqlSingleResult("SELECT * FROM ".$this->sTable." WHERE usr_id = ?",$param);
+		$queryVerif = "SELECT * FROM $this->sTable WHERE email = ?";
+		$verif = $db->sqlSingleResult($queryVerif, ["email"=> $data["email"]]);
+		if($verif) {
+			return "email_exist";
+		}
+
+		$queryInsert = "INSERT INTO $this->sTable(firstname, lastname, email,password, birthday, sexe, avatar, statusId, isConnected, createdAt) VALUES(?,?,?,?,?,?,?,?,?, NOW()"; 
+		$db->sqlSimpleQuery($queryInsert, $data);
+		return "success";
+
+	}
+
+
+	public function login ($login){
+		global $db;
+		global $help;
+
+		$data = [
+			"email"=> $dataForm["email"],
+			"password"=> $help->cryptPass($dataForm["password"])	
+		];
+
+		$query = "SELECT * FROM $this->sTable WHERE email = ? AND password = ?";
+		$user = $db->sqlSingleResult($query, $data);
+		if($user) {
+			if($user->statusId == ACTIVE) {
+				$_SESSION["cinetic"] = $user->id;
+
+				$db->sqlSimpleQuery("UPDATE $this->sTable  SET lastConnected = NOW() WHERE id = ?", ["id"=>$user->id]);
+				return "connected";
+			}
+			else {
+				return $user->statusId;
+			}
+		} else {
+			return "not_exist";
+		}	
+	}
+	//
+	public function getUser ($id){
+		global $db;
+		global $help;
+
+		$query = "SELECT * FROM $this->sTable WHERE id = ?";
+		$user = $db->sqlSingleResult($query, ["id"=> $id]);
 		return $user;
 	}
-	
-	public function loginUser($login, $pwd){
+	// recuperer la liste desz utilisateurs
+	public function getUsers($status = null) {
 		global $db;
-		global $cmn;	
-		
-		$pass= $cmn->cryptPass($pwd);
-		
-		$param = array(
-					"usr_iSta"=>1,
-					"usr_sPass"=>$pass,
-					"usr_sEmail"=>$login,
-					"usr_sPseudo"=>$login
-					);
-		$user= $db->sqlSingleResult("SELECT * FROM ".$this->sTable." WHERE usr_iSta = ? AND usr_sPass = ? AND (usr_sEmail = ? OR usr_sPseudo = ?)",$param);
-		if(!$user){
-			return false;
-		}
-		else{
-			$_SESSION["usr"] = $user->usr_id;
-			return true;
-		}
-	}	
-	
-	public function changePassUser($dataForm)
-	{
-		global $db;
-		global $cmn;
-		
-		$nouveau = ($dataForm['npass']);
-		$ancien = ($dataForm['apass']);
+		global $help;
 
-		$encNouveau = $cmn->cryptPass($nouveau);
-		$encAncien = $cmn->cryptPass($ancien);
-		$tabParamsVerif = array('usr_sPass' => $encAncien,
-			'usr_id' => $_SESSION['usr']);
-					
-		$verif=$db->sqlSingleResult("SELECT COUNT(usr_id) AS nb FROM ".$this->sTable." WHERE usr_sPass=? AND usr_id=?",$tabParamsVerif);
-		if($verif->nb==0){
-			return false;
+		$query = "SELECT * FROM $this->sTable";
+		$data = [];
+		if ($status){
+			$query .= " WHERE statusId= ?";
+			$data = ["statusId"=>$status]; 
 		}
-		elseif($verif->nb==1){
-			$tabParams = array('usr_sPass' => $encNouveau,
-			'usr_id' => $_SESSION['usr']);
-			$results = $db->sqlSimpleQuery('UPDATE '.$this->sTable.' SET usr_sPass = ? WHERE usr_id = ?',$tabParams);
-			return true;
-		}
+		$users = $db->sqlManyResults($query, $data);
+		return $users;
+	}
+
+	// modi
+	public function editUser($dataForm){
+		global $db;
+		global $help;
+
+		$data = [
+			"firstname"=> $help->text($dataForm["firstname"]),
+			"lastname"=> $help->text($dataForm["lasttname"]),
+			"email"=> $dataForm["email"]
+		];
+
+		$data["id"]=$dataForm["id"]
 
 	}
-	
-	
-	
-	public function editInfoUser($dataForm)
-	{
-		global $db;
-		global $cmn;
-		
-		
-		$nom = trim($dataForm["nom"]);
-		$prenom = ucwords(trim($dataForm["prenom"]));
-		$pseudo = trim($dataForm["pseudo"]);
-		if($prenom==""){
-			$prenom=null;
-		}
-			
-		$tabParamsVerifPseudo = array('usr_sPseudo' => $pseudo,
-			'usr_id' => $_SESSION['usr']);
-					
-		$verifPseudo=$db->sqlSingleResult("SELECT COUNT(usr_id) AS nb FROM ".$this->sTable." WHERE usr_sPseudo=? AND usr_id!=?",$tabParamsVerifPseudo);
-		if($verifPseudo->nb!=0){
-			return "pseudo";
-		}
-		else{
-			$tabParams = array(
-			'usr_sNom' => $nom,
-			'usr_sPrenom' => $prenom,
-			'usr_sPseudo' => $pseudo,
-			'usr_id' => $_SESSION['usr']);
-			
-			$results = $db->sqlSimpleQuery('UPDATE '.$this->sTable.' SET usr_sNom=?,usr_sPrenom=?,usr_sPseudo=? WHERE usr_id = ?',$tabParams);
-			return "oui";
-		}
-	}
-	
-	public function createUser($dataForm)
-	{
-		global $db;
-		global $cmn;		
-		
-		$pass = $cmn->cryptPass($dataForm["pass"]);
-		$nom = strtoupper(trim($dataForm["nom"]));
-		$prenom = ucwords(trim($dataForm["prenom"]));
-		$email = strtolower(trim($dataForm["email"]));
-		$pseudo = trim($dataForm["pseudo"]);
-		
-		if($prenom==""){$prenom=null;}
-		
-		$tabParamsVerifEmail = array('usr_sEmail'=> $email, 'usr_iSta'=>1);
-		$tabParamsVerifPseudo = array('usr_sPseudo'=> $pseudo, 'usr_iSta'=>1);
-					
-		$verifEmail=$db->sqlSingleResult("SELECT COUNT(usr_id) AS nb FROM ".$this->sTable." WHERE usr_sEmail=? AND usr_iSta = ? ",$tabParamsVerifEmail);
-		$verifPseudo=$db->sqlSingleResult("SELECT COUNT(usr_id) AS nb FROM ".$this->sTable." WHERE usr_sPseudo=? AND usr_iSta = ? ",$tabParamsVerifPseudo);
-		if($verifEmail->nb!=0){
-			return "email";
-		}
-		else{
-			if($verifPseudo->nb!=0){
-				return "pseudo";
-			}
-			else{
-				$tabParams = array(
-				'usr_iSta' => 1,
-				'usr_sNom' => $nom,
-				'usr_sPrenom' => $prenom,
-				'usr_sEmail' => $email,
-				'usr_sPseudo' => $pseudo,
-				'usr_sPass' => $pass
-				);
-				$results = $db->sqlSimpleQuery('INSERT INTO '.$this->sTable.'(usr_iSta,usr_sNom,usr_sPrenom,usr_sEmail,usr_sPseudo,usr_sPass,usr_dDateIns) 
-				VALUES(?,?,?,?,?,?,CURDATE())',$tabParams);
-				return "oui";
-			}
-			
-		}
-	}	
+
+
+
 }
 ?>

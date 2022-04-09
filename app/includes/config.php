@@ -21,6 +21,7 @@ const TABLE_MESSAGES = 'messages';
 const TABLE_COMMENTS = 'comments';
 const TABLE_STATUS = 'status';
 const TABLE_POSTS = 'posts';
+const TABLE_FRIENDS = 'friends';
 
 
 // expéditeur mail
@@ -28,5 +29,16 @@ const EXP_MAIL		= 'admin@e-cine.xyz'; //kT7@zdmzTK
 
 // avatar par défaut
 const AVATAR_DEFAULT = 'img/user/avatar.png';
+
+// liste des status
+const ACTIVE = 1;
+const STANDBY = 2;
+const DELETE = 3;
+
+
+//BOOL
+CONST V_TRUE =1;
+const V_FALSE = 0;
+
 
 ?>

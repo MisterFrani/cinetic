@@ -67,7 +67,7 @@ class Query {
 
 		return true;
 	}
-
+	// pour ex les re
 	public function executeQuery($query, $params = array())
 	{
 		$this->stmt = $this->cnx->prepare($query);
@@ -92,21 +92,7 @@ class Query {
 
 		return $data;
 	}
-
-	public function sqlManyResultsArray($query, $params = array()) {
-		$data = array();
-
-		$this->executeQuery($query, $params);
-
-		while($ligne = $this->stmt->fetch_assoc()) {
-			$data[] = $ligne;
-		}
-
-		@$this->stmt->closeCursor();
-
-		return $data;
-	}
-
+	//pour rec une info
 	public function sqlSingleResult($query, $params = array()) {
 		$data = array();
 
@@ -119,20 +105,7 @@ class Query {
 		return $data;
 	}
 
-	public function sqlFields($table) {
-		$data = array();
-		$champs = array();
-
-		$data = $this->sqlManyResults("SHOW COLUMNS FROM $table");
-
-		foreach($data as $field) {
-			$champs[] = $field->Field;
-		}
-
-		return $champs;
-	}
-
-
+	//pour injecter une info
 	public function sqlSimpleQuery($query, $params = array()) {
 		$result = $this->executeQuery($query, $params);
 
