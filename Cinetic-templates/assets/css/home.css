@@ -17,6 +17,7 @@
 body{
     color: var(--clr-black);
     line-height: 1.6;
+    padding-bottom: 300px !important;
 
 }
 
@@ -183,18 +184,18 @@ body {
 .modal {
   display: none;
   position: fixed;
-  z-index: 1;
+  z-index: 999;
   left: 0;
   top: 0;
-  height: 100%;
-  width: 50%;
+  height: 50%;
+  width: 100%;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 .modal-content {
   margin: 10% auto;
-  width: 60%;
+  width: 100%;
   box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 7px 20px 0 rgba(0, 0, 0, 0.17);
   animation-name: modalopen;
   animation-duration: var(--modal-duration);
@@ -248,4 +249,67 @@ body {
   to {
     opacity: 1;
   }
+}
+
+
+
+.inputDiv__parent {
+  background-color: var(--clr-gray-light);
+  padding: 20px 20px;
+  border-radius: 8px;
+}
+.inputDiv {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  width: 100%;
+  /* background-color: #E50914; */
+}
+.inputDiv textarea {
+  padding: 15px 16px;
+  min-width:610px;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  resize: none;
+}
+
+
+/* input */
+
+.field {
+  display:flex;
+  position:realtive;
+  margin:5em auto;
+  width:100%;
+  flex-direction:row;
+}
+
+.field>input[type=text],
+.field>button {
+  display:block;
+  
+}
+
+.field>input[type=text] {
+  flex:1;
+  padding:0.6em;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+}
+
+.field>button {
+  padding:0.6em 0.8em;
+  background-color: var(--clr-super-black);
+  color: #fff;
+  border:none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.bg-gray {
+  background-color: var(--clr-gray-light);
+  padding: 2px 20px;
+  border-radius: 8px;
 }
