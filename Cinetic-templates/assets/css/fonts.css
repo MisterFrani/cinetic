@@ -1,0 +1,15 @@
+@font-face {
+    font-family: 'Lato';
+    src: url("/assets/fonts/Lato-Regular.woff2"), url("/assets/fonts/Lato-Regular.woff");
+  }
+  
+  @font-face {
+    font-family: 'Lato';
+    src: url("/assets/fonts/Lato-Black.woff2"),
+      url("/assets/fonts/Lato-Black.woff");
+    font-weight: bold;
+  }
+
+body {
+    font-family: 'Lato', sans-serif;
+  }
