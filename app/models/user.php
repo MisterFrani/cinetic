@@ -14,13 +14,13 @@ class User {
 
 		$data = [
 			"firstname"=> $help->text($dataForm["firstname"]),
-			"lastname"=> $help->text($dataForm["lasttname"]),
+			"lastname"=> $help->text($dataForm["lastname"]),
 			"email"=> $dataForm["email"],
 			"password"=> $help->cryptPass($dataForm["password"]),
 			"birthday"=> $dataForm["birthday"],
 			"sexe"=> $dataForm["sexe"],
 			"avatar"=> AVATAR_DEFAULT,
-			"statusId"=> STANDBY,
+			"statusId"=> ACTIVE,
 			"isConnected"=> V_FALSE
 
 		];
@@ -31,14 +31,13 @@ class User {
 			return "email_exist";
 		}
 
-		$queryInsert = "INSERT INTO $this->sTable(firstname, lastname, email,password, birthday, sexe, avatar, statusId, isConnected, createdAt) VALUES(?,?,?,?,?,?,?,?,?, NOW()"; 
+		$queryInsert = "INSERT INTO $this->sTable(firstname, lastname, email, password, birthday, sexe, avatar, statusId, isConnected, createdAt) VALUES(?,?,?,?,?,?,?,?,?, NOW())"; 
 		$db->sqlSimpleQuery($queryInsert, $data);
 		return "success";
 
 	}
 
-
-	public function login ($login){
+	public function login ($dataForm){
 		global $db;
 		global $help;
 
@@ -53,7 +52,7 @@ class User {
 			if($user->statusId == ACTIVE) {
 				$_SESSION["cinetic"] = $user->id;
 
-				$db->sqlSimpleQuery("UPDATE $this->sTable  SET lastConnected = NOW() WHERE id = ?", ["id"=>$user->id]);
+				$db->sqlSimpleQuery("UPDATE $this->sTable  SET isConnected = 1, lastConnected = NOW() WHERE id = ?", ["id"=>$user->id]);
 				return "connected";
 			}
 			else {
@@ -63,6 +62,7 @@ class User {
 			return "not_exist";
 		}	
 	}
+
 	//
 	public function getUser ($id){
 		global $db;
@@ -72,6 +72,7 @@ class User {
 		$user = $db->sqlSingleResult($query, ["id"=> $id]);
 		return $user;
 	}
+
 	// recuperer la liste desz utilisateurs
 	public function getUsers($status = null) {
 		global $db;
@@ -80,8 +81,8 @@ class User {
 		$query = "SELECT * FROM $this->sTable";
 		$data = [];
 		if ($status){
-			$query .= " WHERE statusId= ?";
-			$data = ["statusId"=>$status]; 
+			$query .= " WHERE statusId= ? AND id != ?";
+			$data = ["statusId"=>$status, "id"=>$_SESSION['cinetic']]; 
 		}
 		$users = $db->sqlManyResults($query, $data);
 		return $users;
@@ -94,15 +95,57 @@ class User {
 
 		$data = [
 			"firstname"=> $help->text($dataForm["firstname"]),
-			"lastname"=> $help->text($dataForm["lasttname"]),
+			"lastname"=> $help->text($dataForm["lastname"]),
 			"email"=> $dataForm["email"]
 		];
 
-		$data["id"]=$dataForm["id"]
+		$query = "UPDATE $this->sTable SET firstname = ?, lastname = ?, email = ? WHERE id = ?"; 
 
+		if(isset($_FILES['avatar']) && $dataForm['avatar'] != ""){
+			$avatar = $help->uploadFile($_FILES['avatar'], REP_AVATAR);
+			if(!$avatar){
+				return 'format_file';
+			}
+			$data["avatar"]=$avatar;
+			$query = "UPDATE $this->sTable SET firstname = ?, lastname = ?, email = ?, avatar = ? WHERE id = ?"; 
+		}
+
+		$data["id"]=$dataForm["id"];
+
+		$db->sqlSimpleQuery($query, $data);
+		return "updated";
 	}
 
+	public function changePassword($dataForm){
+		global $db;
+		global $help;
+
+		$getUser = $this->getUser($dataForm["id"]);
+		if($getUser->password != $help->cryptPass($dataForm["old_password"])){
+			return "incorrect_password";
+		}
+
+		$data = [
+			"password"=> $help->cryptPass($dataForm["password"]),
+			"id"=> $dataForm["id"]
+		];
+
+		$query = "UPDATE $this->sTable SET password = ? WHERE id = ?"; 
+		$db->sqlSimpleQuery($query, $data);
+		return "updated";
+	}
+
+	public function updateStatus($status, $id){
+		global $db;
+		global $help;
 
 
+		$get = "SELECT * FROM $this->sTable WHERE email = ?";
+		$verif = $db->sqlSingleResult($queryVerif, ["email"=> $data["email"]]);
+
+		$query = "UPDATE $this->sTable SET statusId = ? WHERE id = ?"; 
+		$db->sqlSimpleQuery($query, ["statusId"=>$status,"id"=>$id]);
+		return "updated";
+	}
 }
 ?>

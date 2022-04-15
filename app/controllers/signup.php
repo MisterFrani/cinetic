@@ -1,23 +1,31 @@
 <?php  
 include("init.php");
 
-$dataForm = $_REQUEST;
-if (!$cmn->verifMail($dataForm["email"])) {
-    echo "Le format de votre mail est incorrecte";
-}else {
-    $create = $usr->createUser($dataForm);
-    if ($create == "email") {
-        echo "mail déja utilisé";
-        
-    } elseif ($create == "pseudo") {
+$json = file_get_contents('php://input');
+$data = json_decode($json, true);
+$result = array();
 
-        echo "pseudo déja utilisé";
-
-    } elseif ($create == "oui") {
-        echo "Votre compte a été crée , BRAVO !!!!!!!!!!!";
+if(is_array($data))
+{
+    if (!$help->verifMail($data["email"])) {
+        $result["error"] = 'Le format de votre mail est incorrecte';
+        $result["result"] = 'email';
+    }else {
+        $create = $usr->register($data);
+        if ($create == "email_exist") {
+            $result["error"] = 'mail déja utilisé';
+            $result["result"] = 'email';
+        } elseif ($create == "success") {
+            $result["error"] = null;
+            $result["result"] = "Compte crée avec succès";
+        }
     }
-
 }
+else{
+    $result["error"] = 'Erreur des données';
+    $result["result"] = null;
+}
+echo json_encode($result);
 
 include("close.php");
 ?>

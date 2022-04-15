@@ -1,0 +1,207 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+:root {
+    --clr-black: #0F1419;
+    --clr-super-black: #000000;
+    --clr-red: #E50914;
+    --clr-white:#ffffff;
+    --clr-gray: #536471;
+    --clr--gray-dark: #e1e6e7;
+    --clr-gray-light: #F0F2F5;
+}
+body{
+    color: var(--clr-black);
+    line-height: 1.6;
+    height: 100vh;
+}
+/* Layout */
+.layout {
+    display: grid;
+    grid-template-columns: 275px auto 350px;
+    /* grid-template-columns: 275px auto 350px; */
+    margin: 0 auto;
+    width: 1200px;
+
+}
+.layout__right-sidebar {
+    position: fixed;
+    width: 350px;
+}
+/* Brand */
+.brand {
+    height: 32px;
+}
+/* Sidebar menu */
+.sidebar-menu {
+    position: fixed;
+}
+.sidebar-menu__item {
+    font-size: 20px;
+    color: var(--clr-black);
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    padding: 14px;
+}
+.sidebar-menu__item:hover {
+    background-color: #f2dcdd;
+    color: var(--clr-red);
+    border-radius: 8px;
+    transition: 0.4s ease-in-out;
+    cursor: pointer;
+}
+.sidebar-menu__item--active {
+    color: var(--clr-red);
+}
+.sidebar-menu__item-icon {
+    height: 20px;
+    margin-right: 20px;
+}
+.sidebar-menu__item--active .sidebar-menu__item-icon  {
+    filter: invert(15%) sepia(35%) saturate(4692%) hue-rotate(338deg) brightness(146%) contrast(134%);
+}
+/* Main Feed */
+.publish__container {
+    position:fixed;
+    width: 36%;
+    height: 120px;
+    background-color: #E50914;
+    z-index: 9999;
+}
+.feed {
+    margin-top: 180px;
+    display: flex; 
+    border-bottom: 1px solid var(--clr--gray-dark);
+    margin-bottom: 2px;
+    padding: 10px 16px;
+}
+.feed:hover {
+    background-color: rgba(0, 0, 0, 0.1) ;
+    transition: 0.2s ease-in-out;
+    cursor: pointer;
+}
+.feed__author_logo{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 16px;
+}
+.feed__header {
+    display: flex;
+    justify-content: baseline;
+}
+.feed__author-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--clr-black);
+    margin-right: 4px;
+}
+.feed__author-badge {
+    height: 16px;
+    margin-right: 4px;
+    filter: invert(15%) sepia(35%) saturate(4692%) hue-rotate(338deg) brightness(146%) contrast(134%);
+}
+.feed__like-comments {
+    height: 16px;
+    margin-right: 40px;
+    filter: invert(39%) sepia(2%) saturate(4512%) hue-rotate(164deg) brightness(89%) contrast(77%);
+}
+.feed__publish-time{
+    height: 16px;
+    color: var(--clr-gray);
+}
+.feed__message-author-icon {
+    height: 18px;
+    align-items: flex-end;
+    margin-left: 22px;
+    margin-bottom: -3px;
+    filter: invert(39%) sepia(2%) saturate(4512%) hue-rotate(164deg) brightness(89%) contrast(77%);
+}
+.feed__image {
+    width: 100%;
+    margin-top: 8px;
+    border-radius: 8px;
+}
+.feed__message-author:hover {
+    background-color: #f2dcdd;
+    color: var(--clr-red);
+    border-radius: 8px;
+    transition: 0.4s ease-in-out;
+    cursor: pointer;
+}
+
+/* Trends Tendances */
+.trends  {
+    border-radius: 8px;
+    padding: 0 22px;
+}
+.trends__block {
+    padding: 10px 16px;
+    background: var(--clr-gray-light);
+    border-radius: 8px;  
+}
+.trends__limit {
+    border-bottom: 1px solid var(--clr--gray-dark);
+}
+.trends__limit:last-child {
+    border-bottom: none;  
+}
+.trends__heading {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: var(--clr-super-black);
+    font-weight: bold;
+}
+.trends__meta-information {
+
+    font-size: 13px;
+    color: var(--clr-gray);
+}
+.trends__trend-name {
+font-size: 16px;
+font-weight: bold;
+color: var(--clr-super-black);
+margin-bottom: 6px;
+margin-top: 2px;
+}
+.trends__links-parent {
+    padding-top: 25px;
+    padding-bottom: 20px;
+}
+.trends__link {
+    color: var(--clr-red);
+    text-decoration: none;
+}
+/* ADS */
+.ads {
+    padding: 16px 22px;
+}
+.ads__img {
+    width: 100%;
+    border-radius: 8px;
+}
+.ads__badge {
+    width: 120px;
+    padding: 20px 16px;
+    border: none;
+    background-color: var(--clr-gray);
+}
+
+.layout__right-sidebar-header {
+    display: flex;
+    justify-content: right;
+    align-items:center;
+    /* background-color: var(--clr-gray); */
+    height: 80px;
+    margin-bottom: 48px;
+}
+.layout__right-sidebar-header img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
