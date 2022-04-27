@@ -6,10 +6,12 @@ class Friend {
 	public function __construct()
 	{
 		$this->sTable = TABLE_FRIENDS;
+    
 		$this->sTableUsers = TABLE_USERS;
 	}
 
 	public function follow($follow){
+    
 		global $db;
 		global $help;
 
@@ -49,6 +51,7 @@ class Friend {
 			INNER JOIN $this->sTableUsers u ON u.id = f.follower
 			WHERE f.id_user = ?";
 		$followers = $db->sqlManyResults($query, ["id_user"=>$userId]);
+
 		return $followers;
 	}
 
@@ -57,10 +60,12 @@ class Friend {
 		global $db;
 		global $help;
 
+
 		$query = "SELECT f.id_user, f.id, f.follower, u.firstname, u.lastname, u.email, u.birthday, u.sexe, u.avatar, u.isConnected, u.lastConnected
 		FROM $this->sTable f 
 		INNER JOIN $this->sTableUsers u ON u.id = f.id_user
 		WHERE f.follower = ?";
+
 		$followers = $db->sqlManyResults($query, ["follower"=>$follower]);
 		return $followers;
 	}

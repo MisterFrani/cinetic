@@ -51,9 +51,11 @@ class Helper {
 	//redirectionner & renommer une image
 	
 	public function uploadFile($file,$destination){
+
 		$dest = dirname(__FILE__).'/..'.$destination;
 		$extre = explode('.',$file['name']);
 		$verif = array('png','jpg','jpeg','PNG','svg','SVG','JPG','JPEG','mp4','webm','webp','ogg','MP4','WEBM','OGG');
+
 		 if(in_array(end($extre),$verif)){
 			$fichier = round(microtime(true)).'.'.end($extre);
 			move_uploaded_file($file['tmp_name'], $dest . $fichier);

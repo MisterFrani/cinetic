@@ -1,3 +1,4 @@
+
 <section class="right-section-home marg-main-home-right-section">
     <div class="form-groupe">
         <h1> <strong>Cinetic</strong></h1>

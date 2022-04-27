@@ -44,6 +44,7 @@ class Message {
 
 		$query = "SELECT * FROM $this->sTable WHERE (exp = $exp AND dest = $dest) OR (dest = $exp AND exp = $dest) ORDER BY createdAt ASC";
 		$convesations = $db->sqlManyResults($query);
+
 		return $convesations;
 	}
 
