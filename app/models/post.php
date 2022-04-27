@@ -8,6 +8,7 @@ class Post {
 		$this->sTable = TABLE_POSTS;
 		$this->sTableComment = TABLE_COMMENTS;
 		$this->sTableLike = TABLE_LIKES;
+		$this->sTableUsers = TABLE_USERS;
 	}
 
 	public function publish($dataForm){
@@ -15,34 +16,50 @@ class Post {
 		global $help;
 
 		$data = [
-			"content"=> $help->text($dataForm["content"]),
-			"userId"=> $dataForm["userId"],
+			"content"=> trim($dataForm["content"]) ? $help->text($dataForm["content"]) : NULL,
+			"userId"=> $_SESSION['cinetic'],
 			"statusId"=> ACTIVE,
-			"image"=> NULL
+			"image"=> NULL,
+			"type_image" => NULL
 		];
 
-		if(isset($_FILES['image']) && $dataForm['image'] != ""){
+		if($help->text($dataForm["link"])){
+			$data["image"] = $help->text($dataForm["link"]);
+			$data["type_image"] = "YOUTUBE";
+		}
+
+		if(isset($_FILES['image']) && $_FILES['image']['name'] != ""){
 			$image = $help->uploadFile($_FILES['image'], REP_POST);
 			if(!$image){
 				return 'format_file';
 			}
 			$data["image"]=$image;
+			$data["type_image"] = $_FILES['image']["type"];
 		}
 
-		$query = "INSERT INTO $this->sTable(content, userId, statusId, image, createdAt, updatedAt) VALUES(?,?,?,?, NOW(), NOW())"; 
+		$query = "INSERT INTO $this->sTable(content, userId, statusId, image, type_image, createdAt, updatedAt) VALUES(?,?,?,?,?, NOW(), NOW())"; 
 		$db->sqlSimpleQuery($query, $data);
 		return "success";
-
 	}
 
 	//
-	public function getPost ($id){
+	public function getPostsForMe($id, $status = null){
 		global $db;
 		global $help;
 
-		$query = "SELECT * FROM $this->sTable WHERE id = ?";
-		$post = $db->sqlSingleResult($query, ["id"=> $id]);
-		return $post;
+		$query = "SELECT p.id, p.content, p.userId, p.statusId, p.createdAt, p.updatedAt, p.image, p.type_image, 
+					u.firstname, u.lastname, u.email, u.birthday, u.sexe, u.avatar, u.isConnected, u.lastConnected
+					FROM $this->sTable p 
+					INNER JOIN $this->sTableUsers u ON u.id = p.userId 
+					WHERE p.userId = ? ";
+		$data = ["userId"=>$id];
+		if ($status){
+			$query .= " AND p.statusId= ?";
+			$data = ["statusId"=>$status]; 
+		}
+		$query .= " ORDER BY p.createdAt DESC";
+		$posts = $db->sqlManyResults($query, $data);
+		return $posts;
 	}
 
 	// recuperer la liste des posts
@@ -50,13 +67,16 @@ class Post {
 		global $db;
 		global $help;
 
-		$query = "SELECT * FROM $this->sTable";
+		$query = "SELECT p.id, p.content, p.userId, p.statusId, p.createdAt, p.updatedAt, p.image, p.type_image, 
+					u.firstname, u.lastname, u.email, u.birthday, u.sexe, u.avatar, u.isConnected, u.lastConnected
+					FROM $this->sTable p 
+					INNER JOIN $this->sTableUsers u ON u.id = p.userId ";
 		$data = [];
 		if ($status){
-			$query .= " WHERE statusId= ?";
+			$query .= " WHERE p.statusId= ?";
 			$data = ["statusId"=>$status]; 
 		}
-		$query .= " ORDER BY createdAt DESC";
+		$query .= " ORDER BY p.createdAt DESC";
 		$posts = $db->sqlManyResults($query, $data);
 		return $posts;
 	}
@@ -105,7 +125,7 @@ class Post {
 
 		$data = [
 			"content"=> $help->text($dataForm["content"]),
-			"userId"=> $dataForm["userId"],
+			"userId"=> $_SESSION['cinetic'],
 			"postId"=> $dataForm["postId"]
 		];
 
@@ -118,7 +138,11 @@ class Post {
 		global $db;
 		global $help;
 
-		$query = "SELECT * FROM $this->sTableComment WHERE postId = ? ORDER BY createdAt DESC";
+		$query = "SELECT c.id, c.content, c.userId, c.postId, c.createdAt, c.updatedAt,
+		u.firstname, u.lastname, u.email, u.birthday, u.sexe, u.avatar, u.isConnected, u.lastConnected
+		FROM $this->sTableComment c
+		INNER JOIN $this->sTableUsers u ON u.id = c.userId
+		WHERE c.postId = ? ORDER BY c.createdAt ASC";
 		$comments = $db->sqlManyResults($query, ["postId"=>$postId]);
 		return $comments;
 	}
@@ -131,24 +155,20 @@ class Post {
 		return "deleted";
 	}
 
-	public function dislike($postId, $userId) {
+	public function like($postId) {
 		global $db;
 		global $help;
 
-		$db->sqlSimpleQuery("DELETE FROM $this->sTableLike WHERE postId = ? AND userId = ?", ["postId"=>$postId, "userId"=>$userId]);
-		return "disliked";
-	}
-
-	public function like($postId, $userId) {
-		global $db;
-		global $help;
-
-		$getLike = $db->sqlSingleResult("SELECT * FROM $this->sTableLike WHERE postId = ? AND userId = ?", ["postId"=>$postId, "userId"=>$userId]);
+		$getLike = $db->sqlSingleResult("SELECT * FROM $this->sTableLike WHERE postId = ? AND userId = ?", ["postId"=>$postId, "userId"=>$_SESSION['cinetic']]);
 		if(!$getLike){
-			$db->sqlSimpleQuery("INSERT INTO $this->sTableLike(postId, userId) VALUES(?,?)", ["postId"=>$postId, "userId"=>$userId]);
+			$db->sqlSimpleQuery("INSERT INTO $this->sTableLike(postId, userId) VALUES(?,?)", ["postId"=>$postId, "userId"=>$_SESSION['cinetic']]);
+			return "liked";
+		}
+		else {
+			$db->sqlSimpleQuery("DELETE FROM $this->sTableLike WHERE postId = ? AND userId = ?", ["postId"=>$postId, "userId"=>$_SESSION['cinetic']]);
+			return "disliked";
 		}
 		
-		return "liked";
 	}
 
 	public function getLikes($postId) {

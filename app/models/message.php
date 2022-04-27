@@ -14,7 +14,7 @@ class Message {
 
 		$data = [
 			"content"=> $help->text($dataForm["content"]),
-			"exp"=> $dataForm["exp"],
+			"exp"=> $_SESSION['cinetic'],
 			"dest"=> $dataForm["dest"],
 			"viewed"=> V_FALSE
 		];
@@ -30,7 +30,9 @@ class Message {
 		global $db;
 		global $help;
 
-		$query = "SELECT DISTINCT exp, dest, createdAt, content, viewed FROM $this->sTable WHERE exp = ? OR dest = ? ORDER BY createdAt DESC";
+		$query = "SELECT exp, dest, createdAt, content, viewed FROM $this->sTable WHERE (exp = ? OR dest = ?) 
+		GROUP BY exp, dest
+		ORDER BY createdAt DESC";
 		$messages = $db->sqlManyResults($query, ["exp"=>$userId, "dest"=>$userId]);
 		return $messages;
 	}
@@ -40,8 +42,9 @@ class Message {
 		global $db;
 		global $help;
 
-		$query = "SELECT * FROM $this->sTable WHERE exp = ? AND dest = ? ORDER BY createdAt ASC";
-		$convesations = $db->sqlManyResults($query, ["exp"=>$exp, "dest"=>$dest]);
+		$query = "SELECT * FROM $this->sTable WHERE (exp = $exp AND dest = $dest) OR (dest = $exp AND exp = $dest) ORDER BY createdAt ASC";
+		$convesations = $db->sqlManyResults($query);
+
 		return $convesations;
 	}
 

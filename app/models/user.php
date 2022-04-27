@@ -20,7 +20,7 @@ class User {
 			"birthday"=> $dataForm["birthday"],
 			"sexe"=> $dataForm["sexe"],
 			"avatar"=> AVATAR_DEFAULT,
-			"statusId"=> STANDBY,
+			"statusId"=> ACTIVE,
 			"isConnected"=> V_FALSE
 
 		];
@@ -37,7 +37,7 @@ class User {
 
 	}
 
-	public function login ($login){
+	public function login ($dataForm){
 		global $db;
 		global $help;
 
@@ -52,7 +52,7 @@ class User {
 			if($user->statusId == ACTIVE) {
 				$_SESSION["cinetic"] = $user->id;
 
-				$db->sqlSimpleQuery("UPDATE $this->sTable  SET lastConnected = NOW() WHERE id = ?", ["id"=>$user->id]);
+				$db->sqlSimpleQuery("UPDATE $this->sTable  SET isConnected = 1, lastConnected = NOW() WHERE id = ?", ["id"=>$user->id]);
 				return "connected";
 			}
 			else {
@@ -81,8 +81,8 @@ class User {
 		$query = "SELECT * FROM $this->sTable";
 		$data = [];
 		if ($status){
-			$query .= " WHERE statusId= ?";
-			$data = ["statusId"=>$status]; 
+			$query .= " WHERE statusId= ? AND id != ?";
+			$data = ["statusId"=>$status, "id"=>$_SESSION['cinetic']]; 
 		}
 		$users = $db->sqlManyResults($query, $data);
 		return $users;

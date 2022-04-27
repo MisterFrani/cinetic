@@ -28,9 +28,9 @@ const TABLE_FRIENDS = 'friends';
 const EXP_MAIL		= 'admin@e-cine.xyz'; //kT7@zdmzTK
 
 // avatar par défaut
-const AVATAR_DEFAULT = 'assets/img/user/avatar.png';
-const REP_AVATAR = 'assets/img/user/';
-const REP_POST = 'assets/img/post/';
+const AVATAR_DEFAULT = '/public/img/user/avatar.png';
+const REP_AVATAR = '/public/img/user/';
+const REP_POST = '/public/img/post/';
 
 // liste des status
 const ACTIVE = 1;

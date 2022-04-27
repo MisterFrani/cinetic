@@ -6,33 +6,39 @@ class Friend {
 	public function __construct()
 	{
 		$this->sTable = TABLE_FRIENDS;
+    
+		$this->sTableUsers = TABLE_USERS;
 	}
 
-	public function follow($dataForm){
+	public function follow($follow){
+    
 		global $db;
 		global $help;
 
 		$data = [
-			"id_user"=> $dataForm["id_user"],
-			"follower"=> $dataForm["follower"]
+			"id_user"=> $follow,
+			"follower"=> $_SESSION['cinetic']
 		];
 
-		$verif =  $db->sqlSingleResult("SELECT * FROM $this->sTable WHERE id_user = ? AND follower = ?", ["id_user"=>$id_user, "follower"=>$follower]);
+		$verif =  $db->sqlSingleResult("SELECT * FROM $this->sTable WHERE id_user = ? AND follower = ?", $data);
 
 		if(!$verif){
 			$query = "INSERT INTO $this->sTable(id_user, follower, date) VALUES(?,?, NOW())"; 
 			$db->sqlSimpleQuery($query, $data);
+			return "follow";
+
+		} else {
+			$db->sqlSimpleQuery("DELETE FROM $this->sTable WHERE id = ?", ["id"=>$verif->id]);
+			return "unfollow";
 		}
-		return "success";
 	}
 
-
-	public function removeFollower($userId, $follower) {
+	public function removeFollow($id){
 		global $db;
 		global $help;
 
-		$db->sqlSimpleQuery("DELETE FROM $this->sTable WHERE userId = ? AND follower = ?", ["userId"=>$userId, "follower"=>$follower]);
-		return "removed";
+		$db->sqlSimpleQuery("DELETE FROM $this->sTable WHERE id = ?", ["id"=>$id]);
+		return "remove";
 	}
 
 	//Liste des personnes qui me suivent
@@ -40,8 +46,12 @@ class Friend {
 		global $db;
 		global $help;
 
-		$query = "SELECT * FROM $this->sTable WHERE userId = ?";
-		$followers = $db->sqlManyResults($query, ["userId"=>$userId]);
+		$query = "SELECT f.id_user, f.id, f.follower, u.firstname, u.lastname, u.email, u.birthday, u.sexe, u.avatar, u.isConnected, u.lastConnected
+			FROM $this->sTable f 
+			INNER JOIN $this->sTableUsers u ON u.id = f.follower
+			WHERE f.id_user = ?";
+		$followers = $db->sqlManyResults($query, ["id_user"=>$userId]);
+
 		return $followers;
 	}
 
@@ -50,7 +60,12 @@ class Friend {
 		global $db;
 		global $help;
 
-		$query = "SELECT * FROM $this->sTable WHERE follower = ?";
+
+		$query = "SELECT f.id_user, f.id, f.follower, u.firstname, u.lastname, u.email, u.birthday, u.sexe, u.avatar, u.isConnected, u.lastConnected
+		FROM $this->sTable f 
+		INNER JOIN $this->sTableUsers u ON u.id = f.id_user
+		WHERE f.follower = ?";
+
 		$followers = $db->sqlManyResults($query, ["follower"=>$follower]);
 		return $followers;
 	}
